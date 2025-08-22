@@ -1,3 +1,7 @@
+## 0.0.4
+### Added
+- versioning on the home screen
+
 ## 0.0.3
 ### Added
 - go to the home screen button on the player ranking screen
