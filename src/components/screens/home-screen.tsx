@@ -1,12 +1,17 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { BaseScreenProps } from '../../models/base-screen-props.ts';
 import { AppContext } from '../../state/app.provider.tsx';
 import { defaultState } from '../../state/state.ts';
 import { ScreensEnum } from '../../shared/enums/screens.enum.ts';
 import { IconButton } from '../shared/icon-button.tsx';
+import { hideNavigationBar } from 'react-native-navigation-bar-color';
 
 export const HomeScreen = (props: BaseScreenProps) => {
+  useEffect(() => {
+    hideNavigationBar();
+  }, []);
+
   const { navigation } = props;
 
   const { setState } = useContext(AppContext);

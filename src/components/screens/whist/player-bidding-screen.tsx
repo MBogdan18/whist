@@ -6,8 +6,11 @@ import { ScreensEnum } from '../../../shared/enums/screens.enum.ts';
 import { FontAwesome6SolidIconName } from '@react-native-vector-icons/fontawesome6';
 import { IconButton } from '../../shared/icon-button.tsx';
 import { ControlButtons } from '../../shared/control-buttons.tsx';
+import { useConfirmOnLeave } from '../../../hooks/use-confirm-leave.tsx';
 
 export const PlayerBiddingScreen = (props: BaseScreenProps) => {
+  useConfirmOnLeave();
+
   const { navigation } = props;
 
   const { state, setState } = useContext(AppContext);

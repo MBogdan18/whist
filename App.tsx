@@ -12,10 +12,13 @@ import { PlayerBiddingScreen } from './src/components/screens/whist/player-biddi
 import { PlayerBiddingResultsScreen } from './src/components/screens/whist/player-bidding-results-screen.tsx';
 import { PlayerRankingScreen } from './src/components/screens/whist/player-ranking-screen.tsx';
 import { ScreensEnum } from './src/shared/enums/screens.enum.ts';
+import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
 const Stack = createNativeStackNavigator();
 
 function App() {
+  useKeepAwake();
+
   return (
     <AppProvider>
       <NavigationContainer>

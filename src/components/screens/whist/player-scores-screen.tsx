@@ -5,8 +5,11 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 import { BaseScreenProps } from '../../../models/base-screen-props.ts';
 import { ScreensEnum } from '../../../shared/enums/screens.enum.ts';
 import { IconButton } from '../../shared/icon-button.tsx';
+import { useConfirmOnLeave } from '../../../hooks/use-confirm-leave.tsx';
 
 export const PlayerScoresScreen = (props: BaseScreenProps) => {
+  useConfirmOnLeave();
+
   const { navigation } = props;
 
   const { state } = useContext(AppContext);
@@ -14,7 +17,7 @@ export const PlayerScoresScreen = (props: BaseScreenProps) => {
   const height = Dimensions.get('window').height;
 
   const renderButtons = () => {
-    if (state.currentRoundData.roundNumber > 2) {
+    if (state.currentRoundData.roundNumber >= state.cardRounds.length) {
       return <IconButton name={'medal'} onPress={() => navigation.navigate(ScreensEnum.PLAYER_RANKING_SCREEN)} />;
     } else {
       if (state.currentRoundData.roundStep === 'bidding') {

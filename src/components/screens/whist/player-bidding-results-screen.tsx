@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { AppContext } from '../../../state/app.provider.tsx';
 import { StyleSheet, Text, View } from 'react-native';
 import { BaseScreenProps } from '../../../models/base-screen-props.ts';
@@ -6,8 +6,11 @@ import { ScreensEnum } from '../../../shared/enums/screens.enum.ts';
 import { FontAwesome6SolidIconName } from '@react-native-vector-icons/fontawesome6';
 import { IconButton } from '../../shared/icon-button.tsx';
 import { ControlButtons } from '../../shared/control-buttons.tsx';
+import { useConfirmOnLeave } from '../../../hooks/use-confirm-leave.tsx';
 
 export const PlayerBiddingResultsScreen = (props: BaseScreenProps) => {
+  useConfirmOnLeave();
+
   const { navigation } = props;
 
   const { state, setState } = useContext(AppContext);
@@ -19,16 +22,41 @@ export const PlayerBiddingResultsScreen = (props: BaseScreenProps) => {
     ];
   }, [state.playerNames, state.startingPlayerIndex]);
 
-  const initialSelectedOption = useMemo(() => {
-    const scores = state.playerScores[state.currentRoundData.roundNumber].scores;
-
-    const playerScore = scores.find((score) => score.playerName === playerNames[0]);
-
-    return playerScore ? playerScore.bid : null;
-  }, [playerNames, state.currentRoundData.roundNumber, state.playerScores]);
-
-  const [selectedOption, setSelectedOption] = useState<number | null>(initialSelectedOption);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+
+  const isOptionDisabled = useCallback((option: number) => {
+    const currentPlayers = state.numberOfPlayers;
+
+    if (!currentPlayers) {
+      return false;
+    }
+
+    if (currentPlayerIndex !== currentPlayers - 1) {
+      return false;
+    }
+
+    const results = state.playerScores[state.currentRoundData.roundNumber].scores.filter((scores) => scores.result !== null).map((scores) => scores.result as number);
+
+    const summedUpResults = results.reduce((prev, curr) => prev + curr, 0);
+
+    const currentRoundCards = state.cardRounds[state.currentRoundData.roundNumber];
+
+    return currentRoundCards - summedUpResults !== option;
+  }, [currentPlayerIndex, state.cardRounds, state.currentRoundData.roundNumber, state.numberOfPlayers, state.playerScores]);
+
+  useEffect(() => {
+    const scores = state.playerScores[state.currentRoundData.roundNumber]?.scores;
+
+    if (scores) {
+      const playerScore = scores.find((score) => score.playerName === playerNames[0]);
+
+      const selectedOption = playerScore && playerScore.bid !== null && !isOptionDisabled(playerScore.bid) ? playerScore.bid : null;
+
+      setSelectedOption(selectedOption);
+    }
+  }, [isOptionDisabled, playerNames, state.currentRoundData.roundNumber, state.playerScores]);
+
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
 
   const possibleOptions = useMemo(() => {
     const possibilities = [0, 1, 2, 3, 4, 5, 6, 7, 8];
@@ -37,8 +65,6 @@ export const PlayerBiddingResultsScreen = (props: BaseScreenProps) => {
 
     return possibilities.filter((value) => value <= currentRoundCards);
   }, [state.cardRounds, state.currentRoundData]);
-
-
 
   const handleNext = () => {
     const currentPlayers = state.numberOfPlayers;
@@ -87,15 +113,13 @@ export const PlayerBiddingResultsScreen = (props: BaseScreenProps) => {
       };
     });
 
-
-
     if (currentPlayerIndex === currentPlayers - 1) {
       setCurrentPlayerIndex(0);
       setSelectedOption(null);
 
       setState((prevState) => ({
         ...prevState,
-        startingPlayerIndex: prevState.startingPlayerIndex + 1 <= prevState.playerNames.length ? prevState.startingPlayerIndex + 1 : 0,
+        startingPlayerIndex: prevState.startingPlayerIndex + 1 < prevState.playerNames.length ? prevState.startingPlayerIndex + 1 : 0,
         currentRoundData: {
           ...prevState.currentRoundData,
           roundNumber: prevState.currentRoundData.roundNumber + 1,
@@ -112,26 +136,6 @@ export const PlayerBiddingResultsScreen = (props: BaseScreenProps) => {
       setSelectedOption(playerScore ? playerScore.bid : null);
       setCurrentPlayerIndex((prevIndex) => prevIndex + 1);
     }
-  };
-
-  const isOptionDisabled = (option: number) => {
-    const currentPlayers = state.numberOfPlayers;
-
-    if (!currentPlayers) {
-      return false;
-    }
-
-    if (currentPlayerIndex !== currentPlayers - 1) {
-      return false;
-    }
-
-    const results = state.playerScores[state.currentRoundData.roundNumber].scores.filter((scores) => scores.result !== null).map((scores) => scores.result as number);
-
-    const summedUpResults = results.reduce((prev, curr) => prev + curr, 0);
-
-    const currentRoundCards = state.cardRounds[state.currentRoundData.roundNumber];
-
-    return currentRoundCards - summedUpResults !== option;
   };
 
   return (
