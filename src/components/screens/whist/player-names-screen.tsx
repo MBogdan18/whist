@@ -1,11 +1,14 @@
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useContext, useMemo, useState } from 'react';
-import { AppContext } from '../../state/app.provider.tsx';
-import { BaseScreenProps } from '../../models/base-screen-props.ts';
-import { useConfirmOnLeave } from '../../hooks/use-confirm-leave.tsx';
-import { PlayerScore } from '../../state/state.ts';
+import { AppContext } from '../../../state/app.provider.tsx';
+import { BaseScreenProps } from '../../../models/base-screen-props.ts';
+import { useConfirmOnLeave } from '../../../hooks/use-confirm-leave.tsx';
+import { PlayerScore } from '../../../state/state.ts';
+import { ScreensEnum } from '../../../shared/enums/screens.enum.ts';
+import { IconButton } from '../../shared/icon-button.tsx';
+import { ControlButtons } from '../../shared/control-buttons.tsx';
 
-export const Stage3 = (props: BaseScreenProps) => {
+export const PlayerNamesScreen = (props: BaseScreenProps) => {
   useConfirmOnLeave();
 
   const { navigation } = props;
@@ -26,10 +29,6 @@ export const Stage3 = (props: BaseScreenProps) => {
     setPlayerNames((prevPlayerNames) => ([...prevPlayerNames, currentPlayerName]));
     setPlayerIndex((prevIndex) => prevIndex + 1);
     setCurrentPlayerName('');
-  };
-
-  const handleBack = () => {
-    navigation.navigate('Stage2');
   };
 
   const handleConfirm = () => {
@@ -65,11 +64,11 @@ export const Stage3 = (props: BaseScreenProps) => {
       cardRounds: finalGrouping
     }));
 
-    navigation.navigate('Stage4');
+    navigation.navigate(ScreensEnum.PLAYER_SCORES_SCREEN);
   };
 
-  const isConfirmDisabled = useMemo(() => {
-    return playerNames.length !== numberOfPlayers;
+  const haveAllNamesBeenEntered = useMemo(() => {
+    return playerNames.length === numberOfPlayers;
   }, [playerNames, numberOfPlayers]);
 
   if (!numberOfPlayers) {
@@ -79,26 +78,27 @@ export const Stage3 = (props: BaseScreenProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.playerNameContainer}>
-        <Text>Enter the name of player {playerIndex + 1}</Text>
-        <TextInput style={styles.playerNameInput} value={currentPlayerName} onChangeText={setCurrentPlayerName} />
-        <View style={styles.button}>
-          <Button title="Add" disabled={isAddDisabled} onPress={() => handleAddPlayer()} />
-        </View>
-        {playerNames.map((playerName) => (
-          <View key={playerName}>
-            <Text>{playerName}</Text>
+        {!haveAllNamesBeenEntered && (
+          <View style={styles.playerNameSubContainer}>
+            <Text style={styles.title}>Enter the name of player {playerIndex + 1}</Text>
+            <View style={styles.playerNameInputContainer}>
+              <TextInput style={styles.playerNameInput} value={currentPlayerName} onChangeText={setCurrentPlayerName} />
+              <IconButton name={'plus'} disabled={isAddDisabled} onPress={() => handleAddPlayer()} />
+            </View>
           </View>
-        ))}
+        )}
+        <View style={styles.playerNameButtonsContainer}>
+          {playerNames.map((playerName) => (
+            <View style={styles.playerNameButton} key={playerName}>
+              <Button color={'lightgreen'} title={playerName} />
+            </View>
+          ))}
+        </View>
       </View>
 
-      <View style={styles.controlButtonsContainer}>
-        <View style={styles.button}>
-          <Button title="Back" onPress={handleBack} />
-        </View>
-        <View style={styles.button}>
-          <Button disabled={isConfirmDisabled} title="Next" onPress={handleConfirm} />
-        </View>
-      </View>
+      <ControlButtons forwardDisabled={!haveAllNamesBeenEntered}
+                      handleForward={handleConfirm}
+                      navigation={props.navigation} />
     </View>
   );
 };
@@ -116,25 +116,41 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '17.5%',
+    marginTop: '17%',
     width: '100%'
   },
+  playerNameSubContainer: {
+    flexDirection: 'column',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8
+  },
+  playerNameInputContainer: {
+    flexDirection: 'row',
+    gap: 16,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   playerNameInput: {
-    height: 40,
+    height: 50,
     width: '25%',
     margin: 12,
     borderWidth: 1,
     padding: 10,
+    fontFamily: 'monospace',
+    fontSize: 18
   },
-  controlButtonsContainer: {
-    display: 'flex',
+  playerNameButtonsContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    gap: 12,
-    marginBottom: '7.5%'
+    gap: 16,
+    marginBottom: 8
   },
-  button: {
-    width: 128,
+  playerNameButton: {
+    minWidth: 100,
   },
+  title: {
+    fontFamily: 'monospace',
+    fontSize: 18
+  }
 });

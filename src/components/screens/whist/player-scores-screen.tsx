@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
-import { AppContext } from '../../state/app.provider.tsx';
-import { CustomTable } from '../shared/table.tsx';
-import { Button, Dimensions, StyleSheet, View } from 'react-native';
-import { BaseScreenProps } from '../../models/base-screen-props.ts';
+import { AppContext } from '../../../state/app.provider.tsx';
+import { CustomTable } from '../../shared/table.tsx';
+import { Dimensions, StyleSheet, View } from 'react-native';
+import { BaseScreenProps } from '../../../models/base-screen-props.ts';
+import { ScreensEnum } from '../../../shared/enums/screens.enum.ts';
+import { IconButton } from '../../shared/icon-button.tsx';
 
-export const Stage4 = (props: BaseScreenProps) => {
+export const PlayerScoresScreen = (props: BaseScreenProps) => {
   const { navigation } = props;
 
   const { state } = useContext(AppContext);
@@ -13,12 +15,12 @@ export const Stage4 = (props: BaseScreenProps) => {
 
   const renderButtons = () => {
     if (state.currentRoundData.roundNumber > 2) {
-      return <Button onPress={() => navigation.navigate('Stage7')} title={'Placements'} />;
+      return <IconButton name={'medal'} onPress={() => navigation.navigate(ScreensEnum.PLAYER_RANKING_SCREEN)} />;
     } else {
       if (state.currentRoundData.roundStep === 'bidding') {
-        return <Button onPress={() => navigation.navigate('Stage5')} title={'Bid'} />;
+        return <IconButton name={'gavel'} onPress={() => navigation.navigate(ScreensEnum.PLAYER_BIDDING_SCREEN)} />;
       } else if (state.currentRoundData.roundStep === 'results') {
-        return <Button onPress={() => navigation.navigate('Stage6')} title={'Results'} />;
+        return <IconButton name={'equals'} onPress={() => navigation.navigate(ScreensEnum.PLAYER_BIDDING_RESULTS_SCREEN)} />;
       }
     }
   };

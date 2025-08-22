@@ -1,9 +1,9 @@
-import { BaseScreenProps } from '../../models/base-screen-props.ts';
+import { BaseScreenProps } from '../../../models/base-screen-props.ts';
 import { StyleSheet, Text, View } from 'react-native';
 import { useContext, useMemo } from 'react';
-import { AppContext } from '../../state/app.provider.tsx';
+import { AppContext } from '../../../state/app.provider.tsx';
 
-export const Stage7 = (_: BaseScreenProps) => {
+export const PlayerRankingScreen = (_: BaseScreenProps) => {
   const { state } = useContext(AppContext);
 
   const playerRanking = useMemo(() => {

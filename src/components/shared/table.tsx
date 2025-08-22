@@ -48,7 +48,7 @@ export const CustomTable = (props: CustomTableProps) => {
                   </View>
                   {score.scores.map((individualScore, playerIndex) => {
                     const cumulativeScore = playerScores
-                      .slice(0, rowIndex + 1) // all rounds up to current
+                      .slice(0, rowIndex + 1)
                       .reduce((sum, round) => {
                         const s = round.scores[playerIndex]?.score ?? 0;
                         return sum + s;

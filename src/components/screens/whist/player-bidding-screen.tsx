@@ -1,9 +1,13 @@
-import { BaseScreenProps } from '../../models/base-screen-props.ts';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { BaseScreenProps } from '../../../models/base-screen-props.ts';
+import { StyleSheet, Text, View } from 'react-native';
 import { useContext, useMemo, useState } from 'react';
-import { AppContext } from '../../state/app.provider.tsx';
+import { AppContext } from '../../../state/app.provider.tsx';
+import { ScreensEnum } from '../../../shared/enums/screens.enum.ts';
+import { FontAwesome6SolidIconName } from '@react-native-vector-icons/fontawesome6';
+import { IconButton } from '../../shared/icon-button.tsx';
+import { ControlButtons } from '../../shared/control-buttons.tsx';
 
-export const Stage5 = (props: BaseScreenProps) => {
+export const PlayerBiddingScreen = (props: BaseScreenProps) => {
   const { navigation } = props;
 
   const { state, setState } = useContext(AppContext);
@@ -75,7 +79,7 @@ export const Stage5 = (props: BaseScreenProps) => {
         }
       }));
 
-      navigation.navigate('Stage4');
+      navigation.navigate(ScreensEnum.PLAYER_SCORES_SCREEN);
     } else {
       setCurrentPlayerIndex((prevIndex) => prevIndex + 1);
     }
@@ -103,24 +107,22 @@ export const Stage5 = (props: BaseScreenProps) => {
 
   return (
     <View style={styles.container}>
-      <Text>{playerNames[currentPlayerIndex]}</Text>
-
-      <View style={styles.optionsContainer}>
-        {possibleOptions.map((option) => (
-          <View key={option.toString()} style={styles.optionButton}>
-            <Button key={option}
-                    disabled={isOptionDisabled(option)}
-                    color={selectedOption === option ? 'lightgreen' : undefined}
-                    title={option.toString()}
-                    onPress={() => setSelectedOption(option)}
-            />
-          </View>
-        ))}
+      <View style={styles.biddingContainer}>
+        <Text style={styles.title}>{playerNames[currentPlayerIndex]}</Text>
+        <View style={styles.optionsContainer}>
+          {possibleOptions.map((option) => (
+            <IconButton key={option.toString()}
+                        disabled={isOptionDisabled(option)}
+                        color={selectedOption === option ? 'lightgreen' : undefined}
+                        name={option.toString() as FontAwesome6SolidIconName}
+                        onPress={() => setSelectedOption(option)} />
+          ))}
+        </View>
       </View>
 
-      <View style={styles.buttonsContainer}>
-        <Button disabled={selectedOption === null} title={'Next'} onPress={handleNext} />
-      </View>
+      <ControlButtons navigation={props.navigation}
+                      forwardDisabled={selectedOption === null}
+                      handleForward={handleNext} />
     </View>
   );
 };
@@ -130,8 +132,16 @@ const styles = StyleSheet.create({
     display: 'flex',
     flex: 1,
     flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 16,
+  },
+  biddingContainer: {
+    display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: '17.5%',
     gap: 16,
   },
   optionsContainer: {
@@ -141,13 +151,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16
   },
-  optionButton: {
-    width: 40,
-  },
-  buttonsContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center'
+  title: {
+    fontFamily: 'monospace',
+    fontSize: 18
   }
 });
